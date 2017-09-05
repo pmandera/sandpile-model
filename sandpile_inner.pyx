@@ -3,12 +3,13 @@ cimport numpy as np
 
 ctypedef np.double_t DTYPE_t
 
-# Importing cython failed: fall back to python
+
 cpdef unstable_locs(np.ndarray[DTYPE_t, ndim=2] grid):
     return np.argwhere(grid >= 4)
 
 
-cpdef topple_loc(np.ndarray[DTYPE_t, ndim=2] grid, int x, int y, int grid_x_size, int grid_y_size):
+cpdef topple_loc(np.ndarray[DTYPE_t, ndim=2] grid,
+                 int x, int y, int grid_x_size, int grid_y_size):
     grid[x, y] -= 4
 
     if x - 1 >= 0:

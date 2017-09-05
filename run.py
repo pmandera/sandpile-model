@@ -51,8 +51,9 @@ if __name__ == '__main__':
     sandpile = Sandpile(grid_size, grid_size)
 
     def plot_sandpile(sandpile):
-        plot_grid(sandpile.grid, args.plot_dir + '/sandpile-{}.png'.format(
-            sandpile.n_dropped))
+        plot_grid(sandpile.grid,
+                  args.plot_dir + '/sandpile-{:012d}.png'.format(
+                      sandpile.n_dropped))
 
     sandpile.drop_sand(grid_center, grid_center, n_steps, verbose=args.verbose,
                        report_every=plot_every, report_func=plot_sandpile)
