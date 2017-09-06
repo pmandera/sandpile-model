@@ -29,7 +29,7 @@ if __name__ == '__main__':
     parser.add_argument('--n_steps', default=3e5, type=float,
                         help='Number of steps to compute.')
 
-    parser.add_argument('--plot_every', default=1e3, type=float,
+    parser.add_argument('--plot_every', type=float,
                         help='Directory to save plots.')
     parser.add_argument('--plot_dir', default='./plots/',
                         help='Directory to save plots.')
