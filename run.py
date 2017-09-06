@@ -17,7 +17,11 @@ def plot_grid(grid, fout):
 
     fig.add_axes(ax)
 
-    ax.imshow(sandpile.grid/np.max(sandpile.grid))
+    if sandpile.grid.sum() == 0:
+        ax.imshow(sandpile.grid)
+    else:
+        ax.imshow(sandpile.grid/np.max(sandpile.grid))
+
     plt.savefig(fout)
     plt.close('all')
 
