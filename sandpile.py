@@ -3,6 +3,10 @@
 
 from __future__ import print_function
 
+import os
+import gzip
+import cPickle as pickle
+
 import numpy as np
 
 try:
@@ -66,8 +70,18 @@ class Sandpile(object):
         self.grid = np.zeros((x_size, y_size))
 
     def drop_sand(self, x_loc=None, y_loc=None, n=1, verbose=False,
-                  report_every=None, report_func=None):
+                  report_every=None, report_func=None,
+                  checkpoint_every=None, checkpoint_dir=None):
         for step in range(n):
+
+            if report_every is not None and step % report_every == 0:
+                report_func(self)
+
+            if checkpoint_every is not None and step % checkpoint_every == 0:
+                path = os.path.join(
+                    checkpoint_dir,
+                    'sandpile-{:012d}.pckl.gz'.format(self.n_dropped))
+                self.save(path)
 
             self.grid[x_loc, y_loc] += 1
             self.n_dropped += 1
@@ -76,9 +90,6 @@ class Sandpile(object):
 
             if self.store_avalanche_sizes:
                 self.avalanche_sizes.append(avalanche_size)
-
-            if report_every is not None and step % report_every == 0:
-                report_func(self)
 
             if verbose:
                 progress(step, n, self.n_dropped, avalanche_size)
@@ -91,3 +102,12 @@ class Sandpile(object):
 
     def grains_per_dot(self):
         return self.grid.sum()/self.grid_size()
+
+    def save(self, fname):
+        with gzip.open(fname, 'w') as fout:
+            pickle.dump(self, fout)
+
+    @staticmethod
+    def load(fname):
+        with gzip.open(fname, 'rb') as fout:
+            return pickle.load(fout)

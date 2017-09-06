@@ -33,6 +33,14 @@ if __name__ == '__main__':
                         help='Directory to save plots.')
     parser.add_argument('--plot_dir', default='./plots/',
                         help='Directory to save plots.')
+
+    parser.add_argument('--checkpoint',
+                        help='Start from checkpoint, not from empty grid.')
+    parser.add_argument('--checkpoint_every', type=float,
+                        help='Directory to save checkpoints.')
+    parser.add_argument('--checkpoint_dir', default='./checkpoints/',
+                        help='Directory to save checkpoint.')
+
     parser.add_argument('--verbose', action='store_true',
                         help='Inform about progress.')
 
@@ -46,14 +54,26 @@ if __name__ == '__main__':
     else:
         plot_every = None
 
-    grid_center = grid_size/2
+    if args.checkpoint_every is not None:
+        checkpoint_every = int(args.checkpoint_every)
+    else:
+        checkpoint_every = None
 
-    sandpile = Sandpile(grid_size, grid_size)
+    if args.checkpoint is None:
+        sandpile = Sandpile(grid_size, grid_size)
+    else:
+        sandpile = Sandpile.load(args.checkpoint)
+
+    x_grid_center = sandpile.x_size/2
+    y_grid_center = sandpile.y_size/2
 
     def plot_sandpile(sandpile):
         plot_grid(sandpile.grid,
                   args.plot_dir + '/sandpile-{:012d}.png'.format(
                       sandpile.n_dropped))
 
-    sandpile.drop_sand(grid_center, grid_center, n_steps, verbose=args.verbose,
-                       report_every=plot_every, report_func=plot_sandpile)
+    sandpile.drop_sand(x_grid_center, x_grid_center, n_steps,
+                       verbose=args.verbose,
+                       report_every=plot_every, report_func=plot_sandpile,
+                       checkpoint_every=checkpoint_every,
+                       checkpoint_dir=args.checkpoint_dir)
