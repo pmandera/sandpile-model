@@ -6,28 +6,8 @@ from __future__ import print_function
 import os
 import argparse
 
-import numpy as np
-import matplotlib.pyplot as plt
-
 from sandpile.sandpile import Sandpile
-
-
-def plot_grid(grid, path):
-    """Plot a sandpile grid."""
-    fig = plt.figure(figsize=(20, 20), dpi=200.0, frameon=False)
-
-    ax = plt.Axes(fig, [0, 0, 1, 1])
-    ax.set_axis_off()
-
-    fig.add_axes(ax)
-
-    if grid.sum() == 0:
-        ax.imshow(grid)
-    else:
-        ax.imshow(grid/np.max(grid))
-
-    plt.savefig(path)
-    plt.close('all')
+from sandpile.plot import plot_grid
 
 
 def plot_main(args):
