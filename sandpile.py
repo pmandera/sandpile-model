@@ -70,12 +70,8 @@ class Sandpile(object):
         self.grid = np.zeros((x_size, y_size))
 
     def drop_sand(self, x_loc=None, y_loc=None, n=1, verbose=False,
-                  report_every=None, report_func=None,
                   checkpoint_every=None, checkpoint_dir=None):
         for step in range(n):
-
-            if report_every is not None and step % report_every == 0:
-                report_func(self)
 
             if checkpoint_every is not None and step % checkpoint_every == 0:
                 path = os.path.join(

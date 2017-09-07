@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from __future__ import print_function
+
+import os
 import argparse
 
 import numpy as np
@@ -9,7 +12,8 @@ import matplotlib.pyplot as plt
 from sandpile import Sandpile
 
 
-def plot_grid(grid, fout):
+def plot_grid(grid, path):
+    """Plot a sandpile grid."""
     fig = plt.figure(figsize=(20, 20), dpi=200.0, frameon=False)
 
     ax = plt.Axes(fig, [0, 0, 1, 1])
@@ -17,67 +21,79 @@ def plot_grid(grid, fout):
 
     fig.add_axes(ax)
 
-    if sandpile.grid.sum() == 0:
-        ax.imshow(sandpile.grid)
+    if grid.sum() == 0:
+        ax.imshow(grid)
     else:
-        ax.imshow(sandpile.grid/np.max(sandpile.grid))
+        ax.imshow(grid/np.max(grid))
 
-    plt.savefig(fout)
+    plt.savefig(path)
     plt.close('all')
 
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser('Abelian sandpile')
-    parser.add_argument('--grid_size', default=200, type=int,
-                        help='Size of the grid.')
-    parser.add_argument('--n_steps', default=3e5, type=float,
-                        help='Number of steps to compute.')
+def plot_main(args):
+    """Plot checkpoints."""
+    for checkpoint in args.checkpoints:
+        sandpile = Sandpile.load(checkpoint)
+        path = os.path.join(
+            args.plot_dir, 'sandpile-{:012d}.png'.format(sandpile.n_dropped))
 
-    parser.add_argument('--plot_every', type=float,
-                        help='Directory to save plots.')
-    parser.add_argument('--plot_dir', default='./plots/',
-                        help='Directory to save plots.')
+        print('Plotting: {} ==> {}'.format(checkpoint, path))
 
-    parser.add_argument('--checkpoint',
-                        help='Start from checkpoint, not from empty grid.')
-    parser.add_argument('--checkpoint_every', type=float,
-                        help='Directory to save checkpoints.')
-    parser.add_argument('--checkpoint_dir', default='./checkpoints/',
-                        help='Directory to save checkpoint.')
+        plot_grid(sandpile.grid, path)
 
-    parser.add_argument('--verbose', action='store_true',
-                        help='Inform about progress.')
 
-    args = parser.parse_args()
-
+def pour_main(args):
+    """Pour sand on the sandpile."""
     n_steps = int(args.n_steps)
-    grid_size = int(args.grid_size)
 
-    if args.plot_every is not None:
-        plot_every = int(args.plot_every)
+    if args.checkpoint is None:
+        grid_size = int(args.grid_size)
+        sandpile = Sandpile(grid_size, grid_size)
     else:
-        plot_every = None
+        sandpile = Sandpile.load(args.checkpoint)
 
     if args.checkpoint_every is not None:
         checkpoint_every = int(args.checkpoint_every)
     else:
         checkpoint_every = None
 
-    if args.checkpoint is None:
-        sandpile = Sandpile(grid_size, grid_size)
-    else:
-        sandpile = Sandpile.load(args.checkpoint)
-
     x_grid_center = sandpile.x_size/2
     y_grid_center = sandpile.y_size/2
 
-    def plot_sandpile(sandpile):
-        plot_grid(sandpile.grid,
-                  args.plot_dir + '/sandpile-{:012d}.png'.format(
-                      sandpile.n_dropped))
-
-    sandpile.drop_sand(x_grid_center, x_grid_center, n_steps,
+    sandpile.drop_sand(x_grid_center, y_grid_center, n_steps,
                        verbose=args.verbose,
-                       report_every=plot_every, report_func=plot_sandpile,
                        checkpoint_every=checkpoint_every,
                        checkpoint_dir=args.checkpoint_dir)
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser('Abelian sandpile')
+
+    subparsers = parser.add_subparsers(help='commands', dest='command')
+
+    pour_parser = subparsers.add_parser('pour', help='Pour sand.')
+    pour_parser.add_argument('--grid_size', default=200, type=int,
+                             help='Size of the grid.')
+    pour_parser.add_argument('--n_steps', default=3e5, type=float,
+                             help='Number of steps to compute.')
+    pour_parser.add_argument('--checkpoint',
+                             help='Start from checkpoint, not from empty grid.')
+    pour_parser.add_argument('--checkpoint_every', default=1e4, type=float,
+                             help='Directory to save checkpoints.')
+    pour_parser.add_argument('--checkpoint_dir', default='./checkpoints/',
+                             help='Directory to save checkpoint.')
+    pour_parser.add_argument('--verbose', action='store_true',
+                             help='Inform about progress.')
+
+    plot_parser = subparsers.add_parser('plot', help='Plot checkpoints.')
+    plot_parser.add_argument('checkpoints', nargs='+',
+                             help='Directory to read checkpoints from.')
+    plot_parser.add_argument('plot_dir',
+                             help='Directory to save plots.')
+
+    args = parser.parse_args()
+
+    if args.command == 'pour':
+        pour_main(args)
+    elif args.command == 'plot':
+        plot_main(args)
