@@ -60,7 +60,7 @@ def pour_main(args):
     x_grid_center = sandpile.x_size/2
     y_grid_center = sandpile.y_size/2
 
-    sandpile.drop_sand(x_grid_center, y_grid_center, n_steps,
+    sandpile.pour_sand((x_grid_center, y_grid_center), n_steps,
                        verbose=args.verbose,
                        checkpoint_every=checkpoint_every,
                        checkpoint_dir=args.checkpoint_dir)

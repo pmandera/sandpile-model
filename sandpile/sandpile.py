@@ -69,8 +69,11 @@ class Sandpile(object):
         self.n_dropped = 0
         self.grid = np.zeros((x_size, y_size))
 
-    def drop_sand(self, x_loc=None, y_loc=None, n=1, verbose=False,
+    def pour_sand(self, loc=(None, None), n=1, verbose=False,
                   checkpoint_every=None, checkpoint_dir=None):
+
+        x_loc, y_loc = loc
+
         for step in range(n):
 
             if checkpoint_every is not None and step % checkpoint_every == 0:
