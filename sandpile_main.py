@@ -9,7 +9,7 @@ import argparse
 import numpy as np
 import matplotlib.pyplot as plt
 
-from sandpile import Sandpile
+from sandpile.sandpile import Sandpile
 
 
 def plot_grid(grid, path):
