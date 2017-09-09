@@ -17,24 +17,33 @@ except ImportError:
     print('Falling back to slow code...')
 
     def unstable_locs(grid):
+        """Return the coordinates of all unstable spots on the grid."""
         return np.argwhere(grid >= 4)
 
     def topple_loc(grid, x, y, grid_x_size, grid_y_size):
+        """
+        Topple elements in x, y on the grid by moving them to the neighboring
+        spots. If x, y is on the boundary of the grid, some of the chips fall
+        off the grid and disapear.
+        """
         grid[x, y] -= 4
 
         if x - 1 >= 0:
             grid[x - 1, y] += 1
-
         if x + 1 < grid_x_size:
             grid[x + 1, y] += 1
-
         if y - 1 >= 0:
             grid[x, y - 1] += 1
-
         if y + 1 < grid_y_size:
             grid[x, y + 1] += 1
 
     def topple_all_unstable(grid):
+        """
+        Topple all unstable spots on the grid.
+
+        If any other site becomes unstable after toppling repeat until the
+        whole grid becomes stable.
+        """
         avalanche_size = 0
 
         grid_x_size, grid_y_size = grid.shape
@@ -57,6 +66,16 @@ def progress(step, n, n_dropped, avalanche_size):
 
 
 class Sandpile(object):
+    """
+    Class for creating sandpiles.
+
+    On a grid, each site with more than 3 chips topples and sends one of its
+    chips to each of its 4 neighbours.
+
+    For more information see:
+        https://en.wikipedia.org/wiki/Abelian_sandpile_model
+    """
+
     def __init__(self, x_size, y_size, store_avalanche_sizes=False):
 
         self.x_size = x_size
@@ -71,6 +90,12 @@ class Sandpile(object):
 
     def pour_sand(self, loc=(None, None), n=1, verbose=False,
                   checkpoint_every=None, checkpoint_dir=None):
+        """
+        Drop n grains of sand on loc.
+
+        The grains are dropped one by one and unstable locations are toppled
+        after dropping each grain.
+        """
 
         x_loc, y_loc = loc
 
@@ -94,19 +119,24 @@ class Sandpile(object):
                 progress(step, n, self.n_dropped, avalanche_size)
 
     def topple_all_unstable(self):
+        """Topple all unstable locations on the grid."""
         return topple_all_unstable(self.grid)
 
     def grid_size(self):
+        """Size of the grid."""
         return self.x_size * self.y_size
 
     def grains_per_dot(self):
+        """Calculate an average number of grains per grid field."""
         return self.grid.sum()/self.grid_size()
 
     def save(self, fname):
+        """Pickle the sandpile."""
         with gzip.open(fname, 'w') as fout:
             pickle.dump(self, fout)
 
     @staticmethod
     def load(fname):
+        """Load the sandpile from a pickle."""
         with gzip.open(fname, 'rb') as fout:
             return pickle.load(fout)
