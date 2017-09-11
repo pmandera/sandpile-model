@@ -28,7 +28,8 @@ def pour_main(args):
 
     if args.checkpoint is None:
         grid_size = int(args.grid_size)
-        sandpile = Sandpile(grid_size, grid_size)
+        sandpile = Sandpile(grid_size, grid_size,
+                            store_avalanche_sizes=args.store_avalanche_sizes)
     else:
         sandpile = Sandpile.load(args.checkpoint)
 
@@ -62,6 +63,8 @@ if __name__ == '__main__':
                              help='Directory to save checkpoints.')
     pour_parser.add_argument('--checkpoint_dir', default='./checkpoints/',
                              help='Directory to save checkpoint.')
+    pour_parser.add_argument('--store_avalanche_sizes', action='store_true',
+                             help='Remember avalanche sizes.')
     pour_parser.add_argument('--verbose', action='store_true',
                              help='Inform about progress.')
 
