@@ -12,6 +12,8 @@ from sandpile.plot import plot_grid
 
 def plot_main(args):
     """Plot checkpoints."""
+    figsize = tuple([int(i) for i in args.figsize.split(',')])
+
     for checkpoint in args.checkpoints:
         sandpile = Sandpile.load(checkpoint)
         path = os.path.join(
@@ -19,7 +21,7 @@ def plot_main(args):
 
         print('Plotting: {} ==> {}'.format(checkpoint, path))
 
-        plot_grid(sandpile.grid, path)
+        plot_grid(sandpile.grid, path, figsize=figsize, dpi=args.dpi)
 
 
 def pour_main(args):
@@ -73,6 +75,10 @@ if __name__ == '__main__':
                              help='Directory to read checkpoints from.')
     plot_parser.add_argument('plot_dir',
                              help='Directory to save plots.')
+    plot_parser.add_argument('--dpi', default=200.0, type=float,
+                             help='Plot dpi.')
+    plot_parser.add_argument('--figsize', default='5,5',
+                             help='Plot size (e.g. 4,4).')
 
     args = parser.parse_args()
 
