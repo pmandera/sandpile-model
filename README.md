@@ -36,6 +36,12 @@ Plot the sandpile grid.
   ./checkpoints/sandpile-000007470000.pckl.gz ./data/plots/ 
 ```
 
+License
+-------
+
+This code was written by [Paweł Mandera](http://www.pawelmandera.com/) and is
+licensed under the Apache License 2.0.
+
 References
 ----------
 
